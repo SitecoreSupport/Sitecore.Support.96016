@@ -6,14 +6,19 @@ using System.Web;
 namespace Sitecore.Support.ContentSearch.SolrProvider
 {
     using System.Threading;
+    using Microsoft.Practices.ServiceLocation;
     using Sitecore.ContentSearch;
     using Sitecore.ContentSearch.Diagnostics;
     using Sitecore.ContentSearch.Maintenance;
+    using Sitecore.ContentSearch.SolrProvider;
     using Sitecore.ContentSearch.Utilities;
     using SolrNet;
+    using SolrNet.Impl;
 
     public class SwitchOnRebuildSolrSearchIndex : Sitecore.ContentSearch.SolrProvider.SwitchOnRebuildSolrSearchIndex
     {
+        private ISolrOperations<Dictionary<string, object>> tempSolrOperations;
+
         public SwitchOnRebuildSolrSearchIndex(string name, string core, string rebuildcore, IIndexPropertyStore propertyStore) : base(name, core, rebuildcore, propertyStore)
         {
         }
@@ -26,6 +31,8 @@ namespace Sitecore.Support.ContentSearch.SolrProvider
 
             using (new RebuildIndexingTimer(this.PropertyStore))
             {
+                this.tempSolrOperations = ServiceLocator.Current.GetInstance<ISolrOperations<Dictionary<string, object>>>(this.RebuildCore);
+
                 if (resetIndex)
                 {
                     this.Reset(this.tempSolrOperations, this.RebuildCore);
@@ -50,6 +57,7 @@ namespace Sitecore.Support.ContentSearch.SolrProvider
 
             this.SwapCores();
         }
+
         private void Reset(ISolrOperations<Dictionary<string, object>> operations, string coreName)
         {
             CrawlingLog.Log.Debug(string.Format("[Index={0}] Resetting index records [Core: {1}]", this.Name, coreName));
@@ -63,7 +71,8 @@ namespace Sitecore.Support.ContentSearch.SolrProvider
         {
             CrawlingLog.Log.Debug(string.Format("[Index={0}] Swapping cores [{1} -> {2}]", this.Name, this.Core, this.RebuildCore));
 
-            var response = this.solrAdmin.Swap(this.Core, this.RebuildCore);
+            var solrAdmin = SolrContentSearchManager.SolrAdmin as SolrCoreAdmin;
+            var response = solrAdmin.Swap(this.Core, this.RebuildCore);
 
             if (response.Status != 0)
             {

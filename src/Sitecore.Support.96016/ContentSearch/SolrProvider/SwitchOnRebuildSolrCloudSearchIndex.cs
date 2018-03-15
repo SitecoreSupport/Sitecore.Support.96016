@@ -1,5 +1,6 @@
 ﻿namespace Sitecore.Support.ContentSearch.SolrProvider
 {
+    using System.Collections.Generic;
     using Sitecore.ContentSearch;
     using Sitecore.ContentSearch.Diagnostics;
     using Sitecore.ContentSearch.Maintenance;
@@ -8,11 +9,17 @@
     using Sitecore.ContentSearch.Utilities;
     using StringExtensions;
     using System.Threading;
+    using SolrNet;
 
     public class SwitchOnRebuildSolrCloudSearchIndex : Sitecore.ContentSearch.SolrProvider.SwitchOnRebuildSolrCloudSearchIndex
     {
+        private readonly ISolrOperationsFactory solrOperationsFactory;
+
+        private ISolrOperations<Dictionary<string, object>> rebuildSolrOperations;
+
         public SwitchOnRebuildSolrCloudSearchIndex(string name, string mainalias, string rebuildalias, string activecollection, string rebuildcollection, ISolrOperationsFactory solrOperationsFactory, IIndexPropertyStore propertyStore) : base(name, mainalias, rebuildalias, activecollection, rebuildcollection, solrOperationsFactory, propertyStore)
         {
+            this.solrOperationsFactory = solrOperationsFactory;
         }
 
         protected override void PerformRebuild(bool resetIndex, bool optimizeOnComplete, IndexingOptions indexingOptions, CancellationToken cancellationToken)
@@ -24,11 +31,11 @@
 
             using (new RebuildIndexingTimer(this.PropertyStore))
             {
-                // Clear collection before populating it.
+                this.rebuildSolrOperations = this.solrOperationsFactory.GetSolrOperations(this.RebuildCore);
 
+                // Clear collection before populating it.
                 if (resetIndex)
                 {
-                    this.rebuildSolrOperations = this.solrOperationsFactory.GetSolrOperations(this.RebuildCore);
                     this.Reset();
                 }
 
