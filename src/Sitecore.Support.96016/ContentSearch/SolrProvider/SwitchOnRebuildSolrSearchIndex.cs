@@ -50,6 +50,11 @@ namespace Sitecore.Support.ContentSearch.SolrProvider
           this.tempSolrOperations.Optimize();
         }
       }
+      if ((this.IndexingState & IndexingState.Stopped) == IndexingState.Stopped)
+      {
+        CrawlingLog.Log.Debug(string.Format("[Index={0}] Swapping of cores was not done since full rebuild was stopped...", this.Name));
+        return;
+      }
 
       this.SwapCores();
     }
