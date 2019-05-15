@@ -50,6 +50,10 @@
       <HintPath>..\packages\SC.Sitecore.ContentSearch.8.2.7\lib\Sitecore.ContentSearch.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Sitecore.ContentSearch.LuceneProvider, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SC.Sitecore.ContentSearch.LuceneProvider.8.2.7\lib\Sitecore.ContentSearch.LuceneProvider.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Sitecore.ContentSearch.SolrProvider">
       <HintPath>..\packages\SC.Sitecore.ContentSearch.SolrProvider.8.2.7\lib\Sitecore.ContentSearch.SolrProvider.dll</HintPath>
       <Private>False</Private>
@@ -69,6 +73,7 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContentSearch\LuceneProvider\SwitchOnRebuildLuceneIndex.cs" />
     <Compile Include="ContentSearch\SolrProvider\SwitchOnRebuildSolrCloudSearchIndex.cs" />
     <Compile Include="ContentSearch\SolrProvider\SwitchOnRebuildSolrSearchIndex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
